@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { FaShoppingCart } from "react-icons/fa";
+import { auth } from "../firebaseConfig";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 import userIcon from '../assets/icon-image.png';
 
@@ -13,8 +15,18 @@ const Navbar = () => {
    ];
 
    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+   const [user, setUser] = React.useState(null);
+
+   React.useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+         setUser(currentUser);
+      });
+      return () => unsubscribe();
+   }, []);
 
    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
    return (
       <>
@@ -56,13 +68,35 @@ const Navbar = () => {
                   <FaShoppingCart className="ml-10 text-xl lg:text-2xl lg:-mx-12 md:ml-96 sm:ml-80" />
                </Link>
 
-               {/* User Icon (static, no login logic) */}
+               {/* User Icon and Dropdown */}
                <div className="hidden lg:flex items-center space-x-4 relative">
-                  <img
-                     src={userIcon}
-                     alt="User"
-                     className="w-20 h-20 cursor-pointer"
-                  />
+                  {user ? (
+                     <div className="relative">
+                        <img
+                           src={user.photoURL || userIcon}
+                           alt="User"
+                           className="w-20 h-20 cursor-pointer"
+                           onClick={toggleDropdown}
+                        />
+                        {isDropdownOpen && (
+                           <div className="absolute right-0 mt-2 flex flex-col bg-white rounded shadow-md p-2 w-32 z-10">
+                              <button
+                                 onClick={() => signOut(auth)}
+                                 className="text-left hover:bg-gray-100 px-2 py-1 rounded text-sm text-red-600">
+                                 Logout
+                              </button>
+                           </div>
+                        )}
+                     </div>
+                  ) : (
+                     <Link to={"/signIn"}>
+                        <button
+                           type="button"
+                           className="w-full px-3 py-2 text-sm font-semibold text-black rounded-md shadow-sm bg-green-500 hover:bg-black/80 hover:text-white">
+                           Sign in
+                        </button>
+                     </Link>
+                  )}
                </div>
 
                {/* Mobile Menu Icon */}
