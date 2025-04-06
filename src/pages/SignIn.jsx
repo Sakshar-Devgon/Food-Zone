@@ -5,6 +5,14 @@ import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { HiOutlineMail } from "react-icons/hi";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { RiLockPasswordLine } from "react-icons/ri";
+import {
+   auth,
+   signInWithEmailAndPassword,
+   signInWithPopup,
+   googleProvider,
+   facebookProvider
+ } from "../firebaseConfig"; // this path is correct based on your structure
+ 
 
 const SignIn = () => {
    const [email, setEmail] = useState("");
